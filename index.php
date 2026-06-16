@@ -42,4 +42,4 @@ if (!isset($_SESSION['user_id'])) {
 </div>
 
 </body>
-</html>
+</html> // http://localhost/crm/index.php
