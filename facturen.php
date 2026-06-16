@@ -145,7 +145,11 @@ if (isset($_GET['verzend_id']) && isset($_GET['opdracht_id'])) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 </head>
 <body class="bg-light">
-
+<div class="d-md-none p-3 bg-dark text-white">
+    <button class="btn btn-outline-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
+        ☰ Menu
+    </button>
+</div>
 <div class="container-fluid">
     <div class="row">
         <?php include 'sidebar.php'; ?>

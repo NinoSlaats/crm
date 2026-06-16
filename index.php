@@ -1,7 +1,7 @@
 <?php
+session_start();
 require_once 'db.php';
 
-// Als de gebruiker NIET is ingelogd, stuur hem dan direct naar login.php
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;
@@ -14,8 +14,15 @@ if (!isset($_SESSION['user_id'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gilde CRM - Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-light">
+
+<div class="d-md-none p-3 bg-dark text-white">
+    <button class="btn btn-outline-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
+        ☰ Menu
+    </button>
+</div>
 
 <div class="container-fluid">
     <div class="row">
@@ -27,19 +34,18 @@ if (!isset($_SESSION['user_id'])) {
             </div>
 
             <div class="p-5 mb-4 bg-white rounded shadow-sm border">
-                <div class="container-fluid py-2">
-                    <h1 class="display-6 fw-bold text-dark">Welkom terug, <?= htmlspecialchars($_SESSION['user_naam']); ?>!</h1>
-                    <p class="col-md-10 fs-5 text-muted mt-3">
-                        Je bent succesvol ingelogd binnen het CRM-systeem van <strong>Gilde Devops Solutions</strong>. 
-                        Je hebt momenteel de rechten van een: <span class="badge bg-primary"><?= $_SESSION['user_rol']; ?></span>.
-                    </p>
-                    <hr class="my-4">
-                    <p>Gebruik het menu aan de linkerkant om navigeren naar het klantenbeheer of om direct je gewerkte uren te registreren.</p>
-                </div>
+                <h1 class="display-6 fw-bold text-dark">Welkom terug, <?= htmlspecialchars($_SESSION['user_naam']); ?>!</h1>
+                <p class="fs-5 text-muted mt-3">
+                    Je bent succesvol ingelogd bij <strong>Gilde Devops Solutions</strong>. 
+                    Je rol: <span class="badge bg-primary"><?= $_SESSION['user_rol']; ?></span>.
+                </p>
+                <hr class="my-4">
+                <p>Gebruik het menu aan de linkerkant (of de knop hierboven op mobiel) voor navigatie.</p>
             </div>
         </main>
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-</html> // http://localhost/crm/index.php
+</html>

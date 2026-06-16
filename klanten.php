@@ -41,7 +41,11 @@ $klanten = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light">
-
+<div class="d-md-none p-3 bg-dark text-white">
+    <button class="btn btn-outline-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
+        ☰ Menu
+    </button>
+</div>
 <div class="container-fluid">
     <div class="row">
         <?php include 'sidebar.php'; ?>
@@ -129,6 +133,6 @@ $klanten = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </main>
     </div>
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
