@@ -62,6 +62,7 @@ if (isset($_GET['verzend_id']) && isset($_GET['opdracht_id'])) {
         $totaal_bedrag = $subtotaal + $btw;
         
         $mail = new PHPMailer(true);
+$mail->CharSet = 'UTF-8';
 
         try {
             // SMTP Server Instellingen voor Gmail
