@@ -128,7 +128,7 @@ $mail->CharSet = 'UTF-8';
             ";
 
             $mail->send();
-            $verzonden_melding = "Factuur is écht succesvol verzonden naar " . htmlspecialchars($mail_data['email']) . "!";
+            $verzonden_melding = "Factuur is succesvol verzonden naar " . htmlspecialchars($mail_data['email']) . "!";
         } catch (Exception $e) {
             $fout_melding = "E-mail kon niet verzonden worden. Mailer Foutmelding: {$mail->ErrorInfo}";
         }
