@@ -1,4 +1,4 @@
-<nav id="sidebarMenu" class="offcanvas-md offcanvas-start col-md-3 col-lg-2 bg-dark text-white min-vh-100 p-3" tabindex="-1" aria-labelledby="sidebarMenuLabel">
+<nav id="sidebarMenu" class="offcanvas-md offcanvas-start col-md-3 col-lg-2 bg-dark text-white min-vh-100 p-3 sticky-top" style="height: 100vh; overflow-y: auto;" tabindex="-1" aria-labelledby="sidebarMenuLabel">
     
     <div class="offcanvas-header d-md-none">
         <h5 class="offcanvas-title" id="sidebarMenuLabel">Menu</h5>

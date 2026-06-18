@@ -47,6 +47,21 @@ $details_stmt = $conn->query("
     ORDER BY w.datum DESC
 ");
 $gedetailleerde_uren = $details_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// 5. DATA VOOR GRAFIEK (Omzet per klant voor Chart.js)
+$grafiek_stmt = $conn->query("
+    SELECT k.bedrijfsnaam, SUM(w.aantal_uren * o.uurprijs) as totale_omzet
+    FROM klanten k
+    JOIN opdrachten o ON k.id = o.klant_id
+    JOIN werkzaamheden w ON o.id = w.opdracht_id
+    GROUP BY k.bedrijfsnaam
+");
+$grafiek_data = $grafiek_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Omzetten naar JSON voor JavaScript
+$klant_namen = json_encode(array_column($grafiek_data, 'bedrijfsnaam'));
+$klant_omzet = json_encode(array_column($grafiek_data, 'totale_omzet'));
+
 ?>
 
 <!DOCTYPE html>
@@ -173,9 +188,62 @@ $gedetailleerde_uren = $details_stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
             </div>
 
+            <div class="card shadow-sm p-4 bg-white border mt-4">
+    <h4 class="mb-3">📈 Visuele Omzetanalyse per Klant</h4>
+    <div style="height: 300px;">
+        <canvas id="omzetChart"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('omzetChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: <?php echo $klant_namen; ?>,
+            datasets: [{
+                label: 'Totale Omzet in €',
+                data: <?php echo $klant_omzet; ?>,
+                backgroundColor: '#0d6efd'
+            }]
+        },
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false,
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+</script>
+
         </main>
     </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<button id="backToTop" class="btn btn-dark shadow" 
+    style="display: none; position: fixed; bottom: 20px; right: 20px; z-index: 1000; 
+    border-radius: 50%; width: 50px; height: 50px; border: 2px solid #333; background-color: #212529;">
+    ↑
+</button>
+
+<script>
+    const backToTopButton = document.getElementById("backToTop");
+
+    window.onscroll = function() {
+        // Toon de knop als de gebruiker meer dan 300 pixels naar beneden scrolt
+        if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+            backToTopButton.style.display = "block";
+        } else {
+            backToTopButton.style.display = "none";
+        }
+    };
+
+    // Scroll terug naar boven bij klikken
+    backToTopButton.addEventListener("click", function() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+</script>
+
 </body>
 </html>
