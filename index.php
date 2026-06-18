@@ -36,7 +36,7 @@ $mijn_werkzaamheden = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="h2">🏠 Dashboard</h1>
+                <h1 class="h2">Dashboard</h1>
             </div>
 
             <div class="p-5 mb-4 bg-white rounded shadow-sm border">
@@ -50,7 +50,7 @@ $mijn_werkzaamheden = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="col-md-12">
                     <div class="card shadow-sm p-4 bg-white border">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h4 class="mb-0">⚡ Mijn meest recente werkzaamheden</h4>
+                            <h4 class="mb-0">Mijn meest recente werkzaamheden</h4>
                             <a href="uren_schrijven_dashboard.php" class="btn btn-success btn-sm">+ Nieuwe werkzaamheid</a>
                         </div>
                         
@@ -71,8 +71,8 @@ $mijn_werkzaamheden = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                                 <td><span class="badge bg-info text-dark"><?= $w['aantal_uren']; ?> uur</span></td>
                                                 <td><?= htmlspecialchars($w['omschrijving']); ?></td>
                                                 <td>
-                                                    <a href="bewerk_werkzaamheid.php?id=<?= $w['id']; ?>" class="btn btn-sm btn-warning">✎</a>
-                                                    <a href="verwijder_werkzaamheid.php?id=<?= $w['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Verwijderen?');">🗑</a>
+                                                    <a href="bewerk_werkzaamheid.php?id=<?= $w['id']; ?>" class="btn btn-sm btn-warning">Bewerk</a>
+                                                    <a href="verwijder_werkzaamheid.php?id=<?= $w['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Verwijderen?');">Verwijder</a>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>

@@ -12,15 +12,15 @@
         <span class="badge bg-secondary d-block mb-3"><?= $_SESSION['user_rol']; ?></span>
         <hr>
         <ul class="nav nav-pills flex-column mb-auto">
-            <li class="nav-item mb-2"><a href="index.php" class="nav-link text-white">🏠 Dashboard</a></li>
-            <li class="nav-item mb-2"><a href="klanten.php" class="nav-link text-white">🏢 Klanten & Opdrachten</a></li>
-            <li class="nav-item mb-2"><a href="uren_schrijven.php" class="nav-link text-white">✍️ Uren Schrijven</a></li>
+            <li class="nav-item mb-2"><a href="index.php" class="nav-link text-white">Dashboard</a></li>
+            <li class="nav-item mb-2"><a href="klanten.php" class="nav-link text-white">Klanten & Opdrachten</a></li>
+            <li class="nav-item mb-2"><a href="uren_schrijven.php" class="nav-link text-white">Uren Schrijven</a></li>
             <?php if ($_SESSION['user_rol'] !== 'Medewerker'): ?>
-                <li class="nav-item mb-2"><a href="rapportages.php" class="nav-link text-white">📊 Rapportages</a></li>
-                <li class="nav-item mb-2"><a href="facturen.php" class="nav-link text-white">🧾 Facturatie</a></li>
+                <li class="nav-item mb-2"><a href="rapportages.php" class="nav-link text-white">Rapportages</a></li>
+                <li class="nav-item mb-2"><a href="facturen.php" class="nav-link text-white">Facturatie</a></li>
             <?php endif; ?>
             <hr>
-            <li class="nav-item"><a href="logout.php" class="nav-link text-danger">➡️ Uitloggen</a></li>
+            <li class="nav-item"><a href="logout.php" class="nav-link text-danger">Uitloggen</a></li>
         </ul>
     </div>
 </nav>

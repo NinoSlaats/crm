@@ -43,7 +43,7 @@ $klanten = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <body class="bg-light">
 <div class="d-md-none p-3 bg-dark text-white">
     <button class="btn btn-outline-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
-        ☰ Menu
+        Menu
     </button>
 </div>
 <div class="container-fluid">
@@ -52,7 +52,7 @@ $klanten = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="h2">🏢 Klantenbeheer</h1>
+                <h1 class="h2">Klantenbeheer</h1>
             </div>
 
             <?php if(isset($_GET['succes'])): ?>
@@ -87,11 +87,11 @@ $klanten = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             <td><?= htmlspecialchars($klant['contactpersoon']); ?></td>
                                             <td><?= htmlspecialchars($klant['email']); ?></td>
                                            <td>
-    <a href="klant_details.php?id=<?= $klant['id']; ?>" class="btn btn-sm btn-primary">👁️ Bekijk Opdrachten</a>
+    <a href="klant_details.php?id=<?= $klant['id']; ?>" class="btn btn-sm btn-primary">Bekijk Opdrachten</a>
     
     <?php if ($_SESSION['user_rol'] !== 'Medewerker'): ?>
-        <a href="bewerk_klant.php?id=<?= $klant['id']; ?>" class="btn btn-sm btn-warning">✏️</a>
-        <a href="verwijder_klant.php?id=<?= $klant['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Weet je zeker dat je deze klant wilt verwijderen?');">🗑️</a>
+        <a href="bewerk_klant.php?id=<?= $klant['id']; ?>" class="btn btn-sm btn-warning">Bewerk</a>
+        <a href="verwijder_klant.php?id=<?= $klant['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Weet je zeker dat je deze klant wilt verwijderen?');">Verwijder</a>
     <?php endif; ?>
 </td>
                                         </tr>
@@ -107,7 +107,7 @@ $klanten = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="col-md-4">
                     <?php if ($_SESSION['user_rol'] !== 'Medewerker'): ?>
                         <div class="card shadow-sm p-4 bg-white border">
-                            <h4>➕ Nieuwe klant</h4>
+                            <h4>Nieuwe klant</h4>
                             <hr>
                             <form method="POST" action="klanten.php">
                                 <input type="hidden" name="actie_klant_toevoegen" value="1">

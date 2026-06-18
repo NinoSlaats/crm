@@ -58,7 +58,7 @@ $recente_uren = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <body class="bg-light">
 <div class="d-md-none p-3 bg-dark text-white">
     <button class="btn btn-outline-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
-        ☰ Menu
+        Menu
     </button>
 </div>
 <div class="container-fluid">
@@ -67,7 +67,7 @@ $recente_uren = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="h2">✍️ Uren Registreren</h1>
+                <h1 class="h2">Uren Registreren</h1>
             </div>
 
             <?php if (!empty($succes_melding)): ?>
@@ -114,7 +114,7 @@ $recente_uren = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 <div class="col-12 col-md-7">
                     <div class="card shadow-sm p-3 bg-white border">
-                        <h4 class="card-title mb-3">📋 Je recent geschreven uren</h4>
+                        <h4 class="card-title mb-3">Je recent geschreven uren</h4>
                         <div class="table-responsive">
                             <table class="table table-striped align-middle">
                                 <thead>

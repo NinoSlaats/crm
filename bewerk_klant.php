@@ -35,7 +35,7 @@ if (!$klant) { die("Klant niet gevonden."); }
 
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
             <div class="card shadow-sm p-4 bg-white border">
-                <h4>✏️ Klant bewerken: <?= htmlspecialchars($klant['bedrijfsnaam']) ?></h4>
+                <h4>Klant bewerken: <?= htmlspecialchars($klant['bedrijfsnaam']) ?></h4>
                 <hr>
                 <form method="POST">
                     <div class="mb-3">

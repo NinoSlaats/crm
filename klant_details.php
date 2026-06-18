@@ -46,13 +46,13 @@ $voldane_opdrachten = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="row">
         <?php include 'sidebar.php'; ?>
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
-            <a href="klanten.php" class="btn btn-sm btn-outline-secondary mb-3">⬅️ Terug naar klanten</a>
+            <a href="klanten.php" class="btn btn-sm btn-outline-secondary mb-3">Terug naar klanten</a>
             <h1 class="h2"><?= htmlspecialchars($klant['bedrijfsnaam']); ?></h1>
             
             <div class="row mt-4">
                 <div class="col-md-8">
                     <div class="card shadow-sm p-3 mb-4 bg-white border">
-                        <h4 class="text-primary mb-3">⚡ Actieve Opdrachten</h4>
+                        <h4 class="text-primary mb-3">Actieve Opdrachten</h4>
                         <table class="table table-striped">
                             <thead><tr><th>Naam</th><th>Datum</th><th>Prijs</th><th>Actie</th></tr></thead>
                             <tbody>
@@ -62,8 +62,8 @@ $voldane_opdrachten = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         <td><?= date('d-m-Y', strtotime($o['startdatum'])); ?></td>
                                         <td>€ <?= number_format($o['uurprijs'], 2, ',', '.'); ?></td>
                                         <td>
-                                            <a href="bewerk_opdracht.php?id=<?= $o['id']; ?>" class="btn btn-sm btn-warning">✎</a>
-                                            <a href="verwijder_opdracht.php?id=<?= $o['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Verwijderen?');">🗑</a>
+                                            <a href="bewerk_opdracht.php?id=<?= $o['id']; ?>" class="btn btn-sm btn-warning">Bewerk</a>
+                                            <a href="verwijder_opdracht.php?id=<?= $o['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Verwijderen?');">Verwijder</a>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -72,7 +72,7 @@ $voldane_opdrachten = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
 
                     <div class="card shadow-sm p-3 bg-white border">
-                        <h4 class="text-success mb-3">✅ Voldane Opdrachten</h4>
+                        <h4 class="text-success mb-3">Voldane Opdrachten</h4>
                         <table class="table table-striped">
                             <thead><tr><th>Naam</th><th>Datum</th><th>Prijs</th><th>Actie</th></tr></thead>
                             <tbody>
@@ -82,8 +82,8 @@ $voldane_opdrachten = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         <td><?= $o['einddatum'] ? date('d-m-Y', strtotime($o['einddatum'])) : '-'; ?></td>
                                         <td>€ <?= number_format($o['uurprijs'], 2, ',', '.'); ?></td>
                                         <td>
-                                            <a href="bewerk_opdracht.php?id=<?= $o['id']; ?>" class="btn btn-sm btn-warning">✎</a>
-                                            <a href="verwijder_opdracht.php?id=<?= $o['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Verwijderen?');">🗑</a>
+                                            <a href="bewerk_opdracht.php?id=<?= $o['id']; ?>" class="btn btn-sm btn-warning">Bewerk</a>
+                                            <a href="verwijder_opdracht.php?id=<?= $o['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Verwijderen?');">Verwijder</a>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -95,7 +95,7 @@ $voldane_opdrachten = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="col-md-4">
                     <?php if ($_SESSION['user_rol'] !== 'Medewerker'): ?>
                         <div class="card shadow-sm p-4 bg-white border">
-                            <h4>➕ Nieuwe opdracht</h4>
+                            <h4>Nieuwe opdracht</h4>
                             <form method="POST">
                                 <input type="hidden" name="actie_opdracht_toevoegen" value="1">
                                 <div class="mb-3"><label>Naam</label><input type="text" name="naam" class="form-control" required></div>

@@ -48,7 +48,7 @@ $factuur_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="row">
         <?php include 'sidebar.php'; ?>
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
-            <h1 class="h2 mb-4">🧾 Uren Factureren</h1>
+            <h1 class="h2 mb-4">Uren Factureren</h1>
             
             <div class="card shadow-sm p-4 bg-white border">
                 <h4 class="mb-3">Te factureren opdrachten</h4>

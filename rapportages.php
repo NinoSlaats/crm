@@ -75,7 +75,7 @@ $klant_omzet = json_encode(array_column($grafiek_data, 'totale_omzet'));
 <body class="bg-light">
 <div class="d-md-none p-3 bg-dark text-white">
     <button class="btn btn-outline-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
-        ☰ Menu
+        Menu
     </button>
 </div>
 <div class="container-fluid">
@@ -83,7 +83,7 @@ $klant_omzet = json_encode(array_column($grafiek_data, 'totale_omzet'));
         <?php include 'sidebar.php'; ?>
 
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
-            <h1 class="h2 mb-4">📊 Management Rapportages</h1>
+            <h1 class="h2 mb-4">Management Rapportages</h1>
 
             <div class="row mb-4">
                 <div class="col-md-4">
@@ -96,7 +96,7 @@ $klant_omzet = json_encode(array_column($grafiek_data, 'totale_omzet'));
             </div>
 
             <div class="card shadow-sm p-4 bg-white border mb-4">
-                <h4 class="mb-3">📅 Gewerkte uren en omzet per termijn (Maanden)</h4>
+                <h4 class="mb-3">Gewerkte uren en omzet per termijn (Maanden)</h4>
                 <div class="table-responsive">
                     <table class="table table-striped align-middle">
                         <thead>
@@ -124,7 +124,7 @@ $klant_omzet = json_encode(array_column($grafiek_data, 'totale_omzet'));
             </div>
 
             <div class="card shadow-sm p-4 bg-white border mb-4">
-                <h4 class="mb-3">🏆 Meest Rendabele Opdrachten (Top 5)</h4>
+                <h4 class="mb-3">Meest Rendabele Opdrachten (Top 5)</h4>
                 <div class="table-responsive">
                     <table class="table table-striped align-middle">
                         <thead>
@@ -154,7 +154,7 @@ $klant_omzet = json_encode(array_column($grafiek_data, 'totale_omzet'));
             </div>
 
             <div class="card shadow-sm p-4 bg-white border">
-                <h4 class="mb-3">📋 Gedetailleerde Urenspecificatie</h4>
+                <h4 class="mb-3">Gedetailleerde Urenspecificatie</h4>
                 <div class="table-responsive">
                     <table class="table table-bordered table-hover align-middle">
                         <thead class="table-dark">
@@ -189,7 +189,7 @@ $klant_omzet = json_encode(array_column($grafiek_data, 'totale_omzet'));
             </div>
 
             <div class="card shadow-sm p-4 bg-white border mt-4">
-    <h4 class="mb-3">📈 Visuele Omzetanalyse per Klant</h4>
+    <h4 class="mb-3">Visuele Omzetanalyse per Klant</h4>
     <div style="height: 300px;">
         <canvas id="omzetChart"></canvas>
     </div>
