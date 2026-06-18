@@ -86,9 +86,14 @@ $klanten = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             <td><strong><?= htmlspecialchars($klant['bedrijfsnaam']); ?></strong></td>
                                             <td><?= htmlspecialchars($klant['contactpersoon']); ?></td>
                                             <td><?= htmlspecialchars($klant['email']); ?></td>
-                                            <td>
-                                                <a href="klant_details.php?id=<?= $klant['id']; ?>" class="btn btn-sm btn-primary">👁️ Bekijk Opdrachten</a>
-                                            </td>
+                                           <td>
+    <a href="klant_details.php?id=<?= $klant['id']; ?>" class="btn btn-sm btn-primary">👁️ Bekijk Opdrachten</a>
+    
+    <?php if ($_SESSION['user_rol'] !== 'Medewerker'): ?>
+        <a href="bewerk_klant.php?id=<?= $klant['id']; ?>" class="btn btn-sm btn-warning">✏️</a>
+        <a href="verwijder_klant.php?id=<?= $klant['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Weet je zeker dat je deze klant wilt verwijderen?');">🗑️</a>
+    <?php endif; ?>
+</td>
                                         </tr>
                                     <?php endforeach; ?>
                                 <?php else: ?>
