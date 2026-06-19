@@ -1,3 +1,26 @@
+<?php
+// Bepaal huidige pagina voor actieve markering
+$huidige_pagina = basename($_SERVER['PHP_SELF']);
+?>
+<!-- Favicon & laadoverlay: automatisch op elke pagina via sidebar -->
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+<!-- Laadoverlay -->
+<div id="laadOverlay" style="
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(255,255,255,0.75);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 12px;
+">
+    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status"></div>
+    <span class="text-muted fw-semibold">Even geduld...</span>
+</div>
+
 <!-- Hamburger knop - alleen zichtbaar op mobiel -->
 <nav class="navbar navbar-dark bg-dark d-md-none px-3 py-2">
     <span class="navbar-brand fw-bold text-primary">Gilde CRM</span>
@@ -21,15 +44,64 @@
         <span class="badge bg-secondary d-block mb-3"><?= $_SESSION['user_rol']; ?></span>
         <hr>
         <ul class="nav nav-pills flex-column mb-auto">
-            <li class="nav-item mb-2"><a href="index.php" class="nav-link text-white">Dashboard</a></li>
-            <li class="nav-item mb-2"><a href="klanten.php" class="nav-link text-white">Klanten & Opdrachten</a></li>
-            <li class="nav-item mb-2"><a href="uren_schrijven.php" class="nav-link text-white">Uren Schrijven</a></li>
+            <li class="nav-item mb-2">
+                <a href="index.php" class="nav-link <?= $huidige_pagina === 'index.php' ? 'active' : 'text-white' ?>">Dashboard</a>
+            </li>
+            <li class="nav-item mb-2">
+                <a href="klanten.php" class="nav-link <?= in_array($huidige_pagina, ['klanten.php','klant_details.php','bewerk_klant.php','bewerk_opdracht.php']) ? 'active' : 'text-white' ?>">Klanten & Opdrachten</a>
+            </li>
+            <li class="nav-item mb-2">
+                <a href="uren_schrijven.php" class="nav-link <?= in_array($huidige_pagina, ['uren_schrijven.php','uren_schrijven_dashboard.php','bewerk_werkzaamheid.php']) ? 'active' : 'text-white' ?>">Uren Schrijven</a>
+            </li>
             <?php if ($_SESSION['user_rol'] !== 'Medewerker'): ?>
-                <li class="nav-item mb-2"><a href="rapportages.php" class="nav-link text-white">Rapportages</a></li>
-                <li class="nav-item mb-2"><a href="facturen.php" class="nav-link text-white">Facturatie</a></li>
+                <li class="nav-item mb-2">
+                    <a href="rapportages.php" class="nav-link <?= $huidige_pagina === 'rapportages.php' ? 'active' : 'text-white' ?>">Rapportages</a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a href="facturen.php" class="nav-link <?= $huidige_pagina === 'facturen.php' ? 'active' : 'text-white' ?>">Facturatie</a>
+                </li>
             <?php endif; ?>
-            <hr>
-            <li class="nav-item"><a href="logout.php" class="nav-link text-danger">Uitloggen</a></li>
+        </ul>
+        <hr>
+        <ul class="nav nav-pills flex-column">
+            <li class="nav-item">
+                <a href="logout.php" class="nav-link text-danger">Uitloggen</a>
+            </li>
         </ul>
     </div>
 </nav>
+
+<script>
+// Laadanimatie op alle formulieren en verwijder-links
+document.addEventListener('DOMContentLoaded', function () {
+    const overlay = document.getElementById('laadOverlay');
+
+    function toonLaad() {
+        overlay.style.display = 'flex';
+    }
+
+    // Alle formulieren (behalve zoekformulieren)
+    document.querySelectorAll('form').forEach(function (form) {
+        // Sla zoekformulieren over (GET forms met zoek-input)
+        if (form.method.toLowerCase() === 'get') return;
+        form.addEventListener('submit', toonLaad);
+    });
+
+    // Verwijder-links: toon overlay alleen als gebruiker bevestigt
+    document.querySelectorAll('a.btn-danger').forEach(function (link) {
+        const bestaandeOnclick = link.getAttribute('onclick');
+        if (bestaandeOnclick && bestaandeOnclick.includes('confirm')) {
+            link.removeAttribute('onclick');
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+                if (confirm('Weet je zeker dat je dit wilt verwijderen?')) {
+                    toonLaad();
+                    window.location.href = this.href;
+                }
+            });
+        } else {
+            link.addEventListener('click', toonLaad);
+        }
+    });
+});
+</script>
