@@ -1,7 +1,16 @@
-<nav id="sidebarMenu" class="offcanvas-md offcanvas-start col-md-3 col-lg-2 bg-dark text-white min-vh-100 p-3 sticky-top" style="height: 100vh; overflow-y: auto;" tabindex="-1" aria-labelledby="sidebarMenuLabel">
+<!-- Hamburger knop - alleen zichtbaar op mobiel -->
+<nav class="navbar navbar-dark bg-dark d-md-none px-3 py-2">
+    <span class="navbar-brand fw-bold text-primary">Gilde CRM</span>
+    <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+</nav>
+
+<!-- Sidebar -->
+<nav id="sidebarMenu" class="offcanvas-md offcanvas-start col-md-3 col-lg-2 bg-dark text-white p-3" tabindex="-1" aria-labelledby="sidebarMenuLabel">
     
     <div class="offcanvas-header d-md-none">
-        <h5 class="offcanvas-title" id="sidebarMenuLabel">Menu</h5>
+        <h5 class="offcanvas-title text-white" id="sidebarMenuLabel">Menu</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" data-bs-target="#sidebarMenu"></button>
     </div>
 
