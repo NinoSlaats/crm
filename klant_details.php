@@ -10,14 +10,27 @@ $klant = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$klant) { die("Klant niet gevonden."); }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['actie_opdracht_toevoegen'])) {
+    csrf_check();
     if ($_SESSION['user_rol'] !== 'Medewerker') {
-        $stmt = $conn->prepare("INSERT INTO opdrachten (klant_id, naam, startdatum, einddatum, status, uurprijs) VALUES (:klant_id, :naam, :startdatum, :einddatum, :status, :uurprijs)");
-        $stmt->execute([
-            'klant_id' => $klant_id, 'naam' => $_POST['naam'], 'startdatum' => $_POST['startdatum'],
-            'einddatum' => !empty($_POST['einddatum']) ? $_POST['einddatum'] : null,
-            'status' => $_POST['status'], 'uurprijs' => $_POST['uurprijs']
-        ]);
-        header("Location: klant_details.php?id=" . $klant_id . "&succes=1");
+        $naam = trim($_POST['naam']);
+        $uurprijs = $_POST['uurprijs'];
+
+        if ($naam === '' || !is_numeric($uurprijs) || $uurprijs < 0 || empty($_POST['startdatum'])) {
+            header("Location: klant_details.php?id=" . $klant_id . "&fout=ongeldige_invoer");
+            exit;
+        }
+
+        try {
+            $stmt = $conn->prepare("INSERT INTO opdrachten (klant_id, naam, startdatum, einddatum, status, uurprijs) VALUES (:klant_id, :naam, :startdatum, :einddatum, :status, :uurprijs)");
+            $stmt->execute([
+                'klant_id' => $klant_id, 'naam' => $naam, 'startdatum' => $_POST['startdatum'],
+                'einddatum' => !empty($_POST['einddatum']) ? $_POST['einddatum'] : null,
+                'status' => $_POST['status'], 'uurprijs' => $uurprijs
+            ]);
+            header("Location: klant_details.php?id=" . $klant_id . "&succes=1");
+        } catch (PDOException $e) {
+            header("Location: klant_details.php?id=" . $klant_id . "&fout=opslaan_mislukt");
+        }
         exit;
     }
 }
@@ -47,6 +60,26 @@ $voldane_opdrachten = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <a href="klanten.php" class="btn btn-sm btn-outline-secondary mb-3">← Terug naar klanten</a>
     <h1 class="h2 mb-4"><?= htmlspecialchars($klant['bedrijfsnaam']); ?></h1>
 
+    <?php if (isset($_GET['succes'])): ?>
+        <div id="succesMelding" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            Opdracht succesvol toegevoegd.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Sluiten"></button>
+        </div>
+    <?php endif; ?>
+
+    <?php if (isset($_GET['fout'])):
+        $fout_teksten = [
+            'ongeldige_invoer' => 'Vul een geldige naam, startdatum en uurprijs in.',
+            'opslaan_mislukt' => 'Opslaan is helaas mislukt. Probeer het opnieuw.',
+        ];
+        $fout_tekst = $fout_teksten[$_GET['fout']] ?? 'Er is iets misgegaan.';
+    ?>
+        <div id="foutMelding" class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <?= htmlspecialchars($fout_tekst); ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Sluiten"></button>
+        </div>
+    <?php endif; ?>
+
     <div class="row">
         <div class="col-md-8">
             <div class="card shadow-sm p-3 mb-4 bg-white border">
@@ -62,7 +95,11 @@ $voldane_opdrachten = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <td>€ <?= number_format($o['uurprijs'], 2, ',', '.'); ?></td>
                                     <td>
                                         <a href="bewerk_opdracht.php?id=<?= $o['id']; ?>" class="btn btn-sm btn-warning">Bewerk</a>
-                                        <a href="verwijder_opdracht.php?id=<?= $o['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Verwijderen?');">Verwijder</a>
+                                        <form method="POST" action="verwijder_opdracht.php" class="d-inline" onsubmit="return confirm('Verwijderen?');">
+                                            <input type="hidden" name="id" value="<?= $o['id']; ?>">
+                                            <?php csrf_veld(); ?>
+                                            <button type="submit" class="btn btn-sm btn-danger">Verwijder</button>
+                                        </form>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -87,7 +124,11 @@ $voldane_opdrachten = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <td>€ <?= number_format($o['uurprijs'], 2, ',', '.'); ?></td>
                                     <td>
                                         <a href="bewerk_opdracht.php?id=<?= $o['id']; ?>" class="btn btn-sm btn-warning">Bewerk</a>
-                                        <a href="verwijder_opdracht.php?id=<?= $o['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Verwijderen?');">Verwijder</a>
+                                        <form method="POST" action="verwijder_opdracht.php" class="d-inline" onsubmit="return confirm('Verwijderen?');">
+                                            <input type="hidden" name="id" value="<?= $o['id']; ?>">
+                                            <?php csrf_veld(); ?>
+                                            <button type="submit" class="btn btn-sm btn-danger">Verwijder</button>
+                                        </form>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -107,6 +148,7 @@ $voldane_opdrachten = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <hr>
                 <form method="POST">
                     <input type="hidden" name="actie_opdracht_toevoegen" value="1">
+                    <?php csrf_veld(); ?>
                     <div class="mb-3"><label class="form-label">Naam</label><input type="text" name="naam" class="form-control" required></div>
                     <div class="mb-3"><label class="form-label">Startdatum</label><input type="date" name="startdatum" class="form-control" value="<?= date('Y-m-d'); ?>" required></div>
                     <div class="mb-3"><label class="form-label">Uurprijs (€)</label><input type="number" step="0.01" name="uurprijs" class="form-control" required></div>
@@ -125,5 +167,15 @@ $voldane_opdrachten = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    ['succesMelding', 'foutMelding'].forEach(function (elementId) {
+        const melding = document.getElementById(elementId);
+        if (melding) {
+            setTimeout(() => {
+                bootstrap.Alert.getOrCreateInstance(melding).close();
+            }, 4000);
+        }
+    });
+</script>
 </body>
 </html>

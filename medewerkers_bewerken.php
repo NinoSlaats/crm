@@ -20,13 +20,46 @@ if ($id <= 0) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    csrf_check();
+
+    $naam = trim($_POST['naam']);
+    $email = trim($_POST['email']);
+
+    // Alleen toegestane rollen accepteren (whitelist tegen manipulatie van het formulier)
+    $toegestane_rollen = ['Medewerker', 'Verkoopmedewerker', 'Afdelingshoofd', 'Admin'];
+    $rol = in_array($_POST['rol'], $toegestane_rollen) ? $_POST['rol'] : 'Medewerker';
+
+    // Basisvalidatie
+    if ($naam === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        header("Location: medewerkers_bewerken.php?id=$id&fout=ongeldige_invoer");
+        exit;
+    }
+
+    // Voorkom dat je jezelf degradeert naar een rol zonder beheerrechten (buitensluiten)
+    if ($id === (int) $_SESSION['user_id'] && !in_array($rol, ['Afdelingshoofd', 'Verkoopmedewerker'])) {
+        header("Location: medewerkers_bewerken.php?id=$id&fout=zelf_degraderen");
+        exit;
+    }
+
+    // Check op e-mailadres dat al bij een ándere medewerker in gebruik is
+    $stmt = $conn->prepare("SELECT id FROM medewerkers WHERE email = ? AND id != ?");
+    $stmt->execute([$email, $id]);
+    if ($stmt->fetch()) {
+        header("Location: medewerkers_bewerken.php?id=$id&fout=email_bestaat");
+        exit;
+    }
+
     if (!empty($_POST['wachtwoord'])) {
+        if (strlen($_POST['wachtwoord']) < 8) {
+            header("Location: medewerkers_bewerken.php?id=$id&fout=wachtwoord_te_kort");
+            exit;
+        }
         $wachtwoord_hash = password_hash($_POST['wachtwoord'], PASSWORD_DEFAULT);
         $stmt = $conn->prepare("UPDATE medewerkers SET naam = ?, email = ?, rol = ?, wachtwoord = ? WHERE id = ?");
-        $stmt->execute([$_POST['naam'], $_POST['email'], $_POST['rol'], $wachtwoord_hash, $id]);
+        $stmt->execute([$naam, $email, $rol, $wachtwoord_hash, $id]);
     } else {
         $stmt = $conn->prepare("UPDATE medewerkers SET naam = ?, email = ?, rol = ? WHERE id = ?");
-        $stmt->execute([$_POST['naam'], $_POST['email'], $_POST['rol'], $id]);
+        $stmt->execute([$naam, $email, $rol, $id]);
     }
     header("Location: medewerkers.php?succes=bewerkt");
     exit;
@@ -59,6 +92,7 @@ if (!$m) {
 
     <div class="card shadow-sm p-4 bg-white border" style="max-width: 500px;">
         <form method="POST">
+            <?php csrf_veld(); ?>
             <div class="mb-3">
                 <label class="form-label">Naam</label>
                 <input type="text" name="naam" class="form-control" value="<?= htmlspecialchars($m['naam']); ?>" required>

@@ -3,15 +3,32 @@ require_once 'db.php';
 if (!isset($_SESSION['user_id'])) { header("Location: login.php"); exit; }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['actie_klant_toevoegen'])) {
+    csrf_check();
     if ($_SESSION['user_rol'] !== 'Medewerker') {
-        $stmt = $conn->prepare("INSERT INTO klanten (bedrijfsnaam, contactpersoon, adres, email) VALUES (:bedrijfsnaam, :contactpersoon, :adres, :email)");
-        $stmt->execute([
-            'bedrijfsnaam' => $_POST['bedrijfsnaam'],
-            'contactpersoon' => $_POST['contactpersoon'],
-            'adres' => $_POST['adres'],
-            'email' => $_POST['email']
-        ]);
-        header("Location: klanten.php?succes=1");
+        $bedrijfsnaam = trim($_POST['bedrijfsnaam']);
+        $email = trim($_POST['email']);
+
+        if ($bedrijfsnaam === '') {
+            header("Location: klanten.php?fout=ongeldige_invoer");
+            exit;
+        }
+        if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            header("Location: klanten.php?fout=ongeldig_email");
+            exit;
+        }
+
+        try {
+            $stmt = $conn->prepare("INSERT INTO klanten (bedrijfsnaam, contactpersoon, adres, email) VALUES (:bedrijfsnaam, :contactpersoon, :adres, :email)");
+            $stmt->execute([
+                'bedrijfsnaam' => $bedrijfsnaam,
+                'contactpersoon' => trim($_POST['contactpersoon']),
+                'adres' => trim($_POST['adres']),
+                'email' => $email
+            ]);
+            header("Location: klanten.php?succes=1");
+        } catch (PDOException $e) {
+            header("Location: klanten.php?fout=opslaan_mislukt");
+        }
         exit;
     }
 }
@@ -59,7 +76,24 @@ $klanten = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
     <?php if(isset($_GET['succes'])): ?>
-        <div class="alert alert-success shadow-sm">Klant succesvol toegevoegd!</div>
+        <div id="succesMelding" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            Klant succesvol toegevoegd!
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Sluiten"></button>
+        </div>
+    <?php endif; ?>
+
+    <?php if(isset($_GET['fout'])):
+        $fout_teksten = [
+            'ongeldige_invoer' => 'Vul minimaal een bedrijfsnaam in.',
+            'ongeldig_email' => 'Vul een geldig e-mailadres in (of laat het veld leeg).',
+            'opslaan_mislukt' => 'Opslaan is helaas mislukt. Probeer het opnieuw.',
+        ];
+        $fout_tekst = $fout_teksten[$_GET['fout']] ?? 'Er is iets misgegaan.';
+    ?>
+        <div id="foutMelding" class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <?= htmlspecialchars($fout_tekst); ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Sluiten"></button>
+        </div>
     <?php endif; ?>
 
     <div class="row">
@@ -99,7 +133,11 @@ $klanten = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         <a href="klant_details.php?id=<?= $klant['id']; ?>" class="btn btn-sm btn-primary">Bekijk</a>
                                         <?php if ($_SESSION['user_rol'] !== 'Medewerker'): ?>
                                             <a href="bewerk_klant.php?id=<?= $klant['id']; ?>" class="btn btn-sm btn-warning">Bewerk</a>
-                                            <a href="verwijder_klant.php?id=<?= $klant['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Weet je zeker dat je deze klant wilt verwijderen?');">Verwijder</a>
+                                            <form method="POST" action="verwijder_klant.php" class="d-inline" onsubmit="return confirm('Weet je zeker dat je deze klant wilt verwijderen?');">
+                                                <input type="hidden" name="id" value="<?= $klant['id']; ?>">
+                                                <?php csrf_veld(); ?>
+                                                <button type="submit" class="btn btn-sm btn-danger">Verwijder</button>
+                                            </form>
                                         <?php endif; ?>
                                     </td>
                                 </tr>
@@ -126,7 +164,11 @@ $klanten = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <a href="klant_details.php?id=<?= $klant['id']; ?>" class="btn btn-sm btn-primary">Bekijk</a>
                                     <?php if ($_SESSION['user_rol'] !== 'Medewerker'): ?>
                                         <a href="bewerk_klant.php?id=<?= $klant['id']; ?>" class="btn btn-sm btn-warning">Bewerk</a>
-                                        <a href="verwijder_klant.php?id=<?= $klant['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Verwijderen?');">Verwijder</a>
+                                        <form method="POST" action="verwijder_klant.php" class="d-inline" onsubmit="return confirm('Verwijderen?');">
+                                            <input type="hidden" name="id" value="<?= $klant['id']; ?>">
+                                            <?php csrf_veld(); ?>
+                                            <button type="submit" class="btn btn-sm btn-danger">Verwijder</button>
+                                        </form>
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -147,6 +189,7 @@ $klanten = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <hr>
                     <form method="POST" action="klanten.php">
                         <input type="hidden" name="actie_klant_toevoegen" value="1">
+                        <?php csrf_veld(); ?>
                         <div class="mb-3">
                             <label class="form-label">Bedrijfsnaam</label>
                             <input type="text" name="bedrijfsnaam" class="form-control" required>
@@ -209,6 +252,16 @@ $klanten = $stmt->fetchAll(PDO::FETCH_ASSOC);
         geenResultaten.style.display = 'none';
         geenResultatenMobiel.style.display = 'none';
         this.style.display = 'none';
+    });
+
+    // Meldingen automatisch laten verdwijnen na 4 seconden
+    ['succesMelding', 'foutMelding'].forEach(function (elementId) {
+        const melding = document.getElementById(elementId);
+        if (melding) {
+            setTimeout(() => {
+                bootstrap.Alert.getOrCreateInstance(melding).close();
+            }, 4000);
+        }
     });
 </script>
 </body>

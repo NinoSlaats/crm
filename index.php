@@ -8,7 +8,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $stmt = $conn->prepare("
-    SELECT * FROM werkzaamheden_personeel 
+    SELECT * FROM werkzaamheden 
     WHERE medewerker_id = :user_id
     ORDER BY datum DESC
     LIMIT 5
@@ -34,6 +34,22 @@ $mijn_werkzaamheden = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">Dashboard</h1>
     </div>
+
+    <?php if (isset($_GET['succes'])):
+        $succes_teksten = [
+            'werkzaamheid_toegevoegd' => 'Werkzaamheid succesvol toegevoegd.',
+            'aangepast' => 'Werkzaamheid succesvol aangepast.',
+            'werkzaamheid_verwijderd' => 'Werkzaamheid succesvol verwijderd.',
+        ];
+        $succes_tekst = $succes_teksten[$_GET['succes']] ?? null;
+    ?>
+        <?php if ($succes_tekst): ?>
+        <div id="succesMelding" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <?= htmlspecialchars($succes_tekst); ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Sluiten"></button>
+        </div>
+        <?php endif; ?>
+    <?php endif; ?>
 
     <div class="p-4 mb-4 bg-white rounded shadow-sm border">
         <h1 class="display-6 fw-bold text-dark">Welkom terug, <?= htmlspecialchars($_SESSION['user_naam']); ?>!</h1>
@@ -66,8 +82,13 @@ $mijn_werkzaamheden = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <td><span class="badge bg-info text-dark"><?= $w['aantal_uren']; ?> uur</span></td>
                                 <td><?= htmlspecialchars($w['omschrijving']); ?></td>
                                 <td>
-                                    <a href="bewerk_werkzaamheid.php?id=<?= $w['id']; ?>" class="btn btn-sm btn-warning">Bewerk</a>
-                                    <a href="verwijder_werkzaamheid.php?id=<?= $w['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Verwijderen?');">Verwijder</a>
+                                    <a href="bewerk_werkzaamheid.php?id=<?= $w['id']; ?>&terug=index.php" class="btn btn-sm btn-warning">Bewerk</a>
+                                    <form method="POST" action="verwijder_werkzaamheid.php" class="d-inline" onsubmit="return confirm('Verwijderen?');">
+                                        <input type="hidden" name="id" value="<?= $w['id']; ?>">
+                                        <input type="hidden" name="terug" value="index.php">
+                                        <?php csrf_veld(); ?>
+                                        <button type="submit" class="btn btn-sm btn-danger">Verwijder</button>
+                                    </form>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -81,5 +102,13 @@ $mijn_werkzaamheden = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const succesMelding = document.getElementById('succesMelding');
+    if (succesMelding) {
+        setTimeout(() => {
+            bootstrap.Alert.getOrCreateInstance(succesMelding).close();
+        }, 4000);
+    }
+</script>
 </body>
 </html>

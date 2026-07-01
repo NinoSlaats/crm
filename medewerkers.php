@@ -33,6 +33,30 @@ if (isset($_GET['succes'])) {
     }
 }
 
+$fout_melding = '';
+if (isset($_GET['fout'])) {
+    switch ($_GET['fout']) {
+        case 'ongeldige_invoer':
+            $fout_melding = 'Vul een geldige naam en een geldig e-mailadres in.';
+            break;
+        case 'wachtwoord_te_kort':
+            $fout_melding = 'Het wachtwoord moet minimaal 8 tekens lang zijn.';
+            break;
+        case 'email_bestaat':
+            $fout_melding = 'Dit e-mailadres is al in gebruik door een andere medewerker.';
+            break;
+        case 'opslaan_mislukt':
+            $fout_melding = 'Opslaan is helaas mislukt. Probeer het opnieuw.';
+            break;
+        case 'zelf_verwijderen':
+            $fout_melding = 'Je kunt je eigen account niet verwijderen.';
+            break;
+        case 'zelf_degraderen':
+            $fout_melding = 'Je kunt je eigen rol niet wijzigen naar een rol zonder beheerrechten.';
+            break;
+    }
+}
+
 $stmt = $conn->query("SELECT id, naam, email, rol FROM medewerkers ORDER BY naam ASC");
 $medewerkers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
@@ -66,6 +90,13 @@ $medewerkers = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
     <?php endif; ?>
 
+    <?php if (!empty($fout_melding)): ?>
+        <div id="foutMelding" class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <?= htmlspecialchars($fout_melding); ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Sluiten"></button>
+        </div>
+    <?php endif; ?>
+
     <div class="card shadow-sm p-4 bg-white border">
         <div class="table-responsive">
             <table class="table table-striped align-middle">
@@ -88,7 +119,11 @@ $medewerkers = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <td>
                                     <div class="d-flex gap-2">
                                         <a href="medewerkers_bewerken.php?id=<?= $m['id']; ?>" class="btn btn-sm btn-warning">Bewerk</a>
-                                        <a href="medewerkers_verwijderen.php?id=<?= $m['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Weet je zeker dat je deze medewerker wilt verwijderen?');">Verwijder</a>
+                                        <form method="POST" action="medewerkers_verwijderen.php" class="d-inline" onsubmit="return confirm('Weet je zeker dat je deze medewerker wilt verwijderen?');">
+                                            <input type="hidden" name="id" value="<?= $m['id']; ?>">
+                                            <?php csrf_veld(); ?>
+                                            <button type="submit" class="btn btn-sm btn-danger">Verwijder</button>
+                                        </form>
                                     </div>
                                 </td>
                                 <?php endif; ?>
@@ -108,6 +143,7 @@ $medewerkers = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="modal-dialog">
         <div class="modal-content">
             <form method="POST" action="medewerkers_toevoegen.php">
+                <?php csrf_veld(); ?>
                 <div class="modal-header">
                     <h5 class="modal-title">Nieuwe medewerker toevoegen</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -147,14 +183,16 @@ $medewerkers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Melding automatisch laten verdwijnen na 4 seconden
-    const succesMelding = document.getElementById('succesMelding');
-    if (succesMelding) {
-        setTimeout(() => {
-            const alertInstance = bootstrap.Alert.getOrCreateInstance(succesMelding);
-            alertInstance.close();
-        }, 4000);
-    }
+    // Meldingen automatisch laten verdwijnen na 4 seconden
+    ['succesMelding', 'foutMelding'].forEach(function (elementId) {
+        const melding = document.getElementById(elementId);
+        if (melding) {
+            setTimeout(() => {
+                const alertInstance = bootstrap.Alert.getOrCreateInstance(melding);
+                alertInstance.close();
+            }, 4000);
+        }
+    });
 </script>
 </body>
 </html>

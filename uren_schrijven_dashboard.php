@@ -8,8 +8,10 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $stmt = $conn->prepare("INSERT INTO werkzaamheden_personeel (medewerker_id, datum, aantal_uren, omschrijving) VALUES (?, ?, ?, ?)");
-    $stmt->execute([$_SESSION['user_id'], $_POST['datum'], $_POST['aantal_uren'], $_POST['omschrijving']]);
+    csrf_check();
+    $opdracht_id = intval($_POST['opdracht_id']);
+    $stmt = $conn->prepare("INSERT INTO werkzaamheden (medewerker_id, opdracht_id, datum, aantal_uren, omschrijving) VALUES (?, ?, ?, ?, ?)");
+    $stmt->execute([$_SESSION['user_id'], $opdracht_id, $_POST['datum'], $_POST['aantal_uren'], $_POST['omschrijving']]);
     header("Location: index.php?succes=werkzaamheid_toegevoegd");
     exit;
 }
@@ -32,6 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h3>Nieuwe werkzaamheid</h3>
         <hr>
         <form method="POST">
+            <?php csrf_veld(); ?>
             <div class="mb-3">
                 <label class="form-label">Opdracht</label>
                 <select name="opdracht_id" class="form-select" required>

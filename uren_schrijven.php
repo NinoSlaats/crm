@@ -11,6 +11,7 @@ $succes_melding = '';
 
 // --- UREN OPSLAAN (Create) ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['actie_uren_schrijven'])) {
+    csrf_check();
     $opdracht_id = intval($_POST['opdracht_id']);
     $datum = $_POST['datum'];
     $aantal_uren = floatval($_POST['aantal_uren']);
@@ -26,6 +27,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['actie_uren_schrijven'
             'omschrijving' => $omschrijving
         ]);
         $succes_melding = "Je uren zijn succesvol geregistreerd!";
+    }
+}
+
+// Melding tonen als we terugkomen van bewerken/verwijderen
+if (empty($succes_melding) && isset($_GET['succes'])) {
+    if ($_GET['succes'] === 'aangepast') {
+        $succes_melding = "Werkzaamheid succesvol aangepast.";
+    } elseif ($_GET['succes'] === 'werkzaamheid_verwijderd') {
+        $succes_melding = "Werkzaamheid succesvol verwijderd.";
     }
 }
 
@@ -65,7 +75,10 @@ $recente_uren = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
     <?php if (!empty($succes_melding)): ?>
-        <div class="alert alert-success shadow-sm"><?= $succes_melding; ?></div>
+        <div id="succesMelding" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <?= htmlspecialchars($succes_melding); ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Sluiten"></button>
+        </div>
     <?php endif; ?>
 
     <div class="row">
@@ -75,6 +88,7 @@ $recente_uren = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <hr>
                 <form method="POST" action="uren_schrijven.php">
                     <input type="hidden" name="actie_uren_schrijven" value="1">
+                    <?php csrf_veld(); ?>
                     
                     <div class="mb-3">
                         <label class="form-label">Kies de Opdracht</label>
@@ -117,6 +131,7 @@ $recente_uren = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <th>Opdracht</th>
                                 <th>Uren</th>
                                 <th>Omschrijving</th>
+                                <th>Actie</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -127,10 +142,19 @@ $recente_uren = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         <td><strong><?= htmlspecialchars($uur['opdracht_naam']); ?></strong></td>
                                         <td><span class="badge bg-primary"><?= number_format($uur['aantal_uren'], 2, ',', '.'); ?> uur</span></td>
                                         <td class="small text-muted"><?= htmlspecialchars($uur['omschrijving']); ?></td>
+                                        <td class="text-nowrap">
+                                            <a href="bewerk_werkzaamheid.php?id=<?= $uur['id']; ?>&terug=uren_schrijven.php" class="btn btn-sm btn-warning">Bewerk</a>
+                                            <form method="POST" action="verwijder_werkzaamheid.php" class="d-inline" onsubmit="return confirm('Verwijderen?');">
+                                                <input type="hidden" name="id" value="<?= $uur['id']; ?>">
+                                                <input type="hidden" name="terug" value="uren_schrijven.php">
+                                                <?php csrf_veld(); ?>
+                                                <button type="submit" class="btn btn-sm btn-danger">Verwijder</button>
+                                            </form>
+                                        </td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php else: ?>
-                                <tr><td colspan="4" class="text-center text-muted py-3">Je hebt nog geen uren geschreven deze periode.</td></tr>
+                                <tr><td colspan="5" class="text-center text-muted py-3">Je hebt nog geen uren geschreven deze periode.</td></tr>
                             <?php endif; ?>
                         </tbody>
                     </table>
@@ -141,5 +165,13 @@ $recente_uren = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const succesMelding = document.getElementById('succesMelding');
+    if (succesMelding) {
+        setTimeout(() => {
+            bootstrap.Alert.getOrCreateInstance(succesMelding).close();
+        }, 4000);
+    }
+</script>
 </body>
 </html>

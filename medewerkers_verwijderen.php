@@ -1,5 +1,4 @@
 <?php
-session_start();
 require_once 'db.php';
 
 if (!isset($_SESSION['user_id'])) {
@@ -7,17 +6,17 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-$mag_beheren = isset($_SESSION['user_rol']) && in_array($_SESSION['user_rol'], ['Afdelingshoofd', 'Verkoopmedewerker']);
-if (!$mag_beheren) {
-    header("Location: medewerkers.php");
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header("Location: klanten.php");
     exit;
 }
 
-$id = intval($_GET['id'] ?? 0);
-if ($id > 0) {
-    $stmt = $conn->prepare("DELETE FROM medewerkers WHERE id = ?");
-    $stmt->execute([$id]);
-}
+csrf_check();
 
-header("Location: medewerkers.php?succes=verwijderd");
+// Alleen voor hogere rollen
+if ($_SESSION['user_rol'] !== 'Medewerker' && isset($_POST['id'])) {
+    $stmt = $conn->prepare("DELETE FROM klanten WHERE id = ?");
+    $stmt->execute([intval($_POST['id'])]);
+}
+header("Location: klanten.php");
 exit;

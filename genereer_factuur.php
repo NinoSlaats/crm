@@ -10,6 +10,13 @@ if (!isset($_SESSION['user_id']) && !isset($_SESSION['medewerker_id'])) {
     exit();
 }
 
+// Alleen Verkoopmedewerker en Afdelingshoofd mogen facturen genereren
+$rol = $_SESSION['user_rol'] ?? $_SESSION['rol'] ?? 'Medewerker';
+if ($rol === 'Medewerker') {
+    header("Location: index.php");
+    exit();
+}
+
 if (!isset($_GET['opdracht_id']) || empty($_GET['opdracht_id'])) {
     die("Geen opdracht geselecteerd.");
 }

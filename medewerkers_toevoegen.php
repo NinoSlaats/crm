@@ -14,15 +14,43 @@ if (!$mag_beheren) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    csrf_check();
+
     $naam = trim($_POST['naam']);
     $email = trim($_POST['email']);
-    $rol = $_POST['rol'];
-    $wachtwoord_hash = password_hash($_POST['wachtwoord'], PASSWORD_DEFAULT);
+    $wachtwoord = $_POST['wachtwoord'];
 
-    $stmt = $conn->prepare("INSERT INTO medewerkers (naam, email, wachtwoord, rol) VALUES (?, ?, ?, ?)");
-    $stmt->execute([$naam, $email, $wachtwoord_hash, $rol]);
+    // Alleen toegestane rollen accepteren (whitelist tegen manipulatie van het formulier)
+    $toegestane_rollen = ['Medewerker', 'Verkoopmedewerker', 'Afdelingshoofd', 'Admin'];
+    $rol = in_array($_POST['rol'], $toegestane_rollen) ? $_POST['rol'] : 'Medewerker';
 
-    header("Location: medewerkers.php?succes=toegevoegd");
+    // Basisvalidatie
+    if ($naam === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        header("Location: medewerkers.php?fout=ongeldige_invoer");
+        exit;
+    }
+    if (strlen($wachtwoord) < 8) {
+        header("Location: medewerkers.php?fout=wachtwoord_te_kort");
+        exit;
+    }
+
+    // Check op bestaand e-mailadres
+    $stmt = $conn->prepare("SELECT id FROM medewerkers WHERE email = ?");
+    $stmt->execute([$email]);
+    if ($stmt->fetch()) {
+        header("Location: medewerkers.php?fout=email_bestaat");
+        exit;
+    }
+
+    $wachtwoord_hash = password_hash($wachtwoord, PASSWORD_DEFAULT);
+
+    try {
+        $stmt = $conn->prepare("INSERT INTO medewerkers (naam, email, wachtwoord, rol) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$naam, $email, $wachtwoord_hash, $rol]);
+        header("Location: medewerkers.php?succes=toegevoegd");
+    } catch (PDOException $e) {
+        header("Location: medewerkers.php?fout=opslaan_mislukt");
+    }
     exit;
 }
 
