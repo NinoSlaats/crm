@@ -60,7 +60,10 @@ $medewerkers = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
     <?php if (!empty($succes_melding)): ?>
-        <div class="alert alert-success shadow-sm"><?= htmlspecialchars($succes_melding); ?></div>
+        <div id="succesMelding" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <?= htmlspecialchars($succes_melding); ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Sluiten"></button>
+        </div>
     <?php endif; ?>
 
     <div class="card shadow-sm p-4 bg-white border">
@@ -143,5 +146,15 @@ $medewerkers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <?php endif; ?>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Melding automatisch laten verdwijnen na 4 seconden
+    const succesMelding = document.getElementById('succesMelding');
+    if (succesMelding) {
+        setTimeout(() => {
+            const alertInstance = bootstrap.Alert.getOrCreateInstance(succesMelding);
+            alertInstance.close();
+        }, 4000);
+    }
+</script>
 </body>
 </html>
